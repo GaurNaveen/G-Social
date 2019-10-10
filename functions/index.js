@@ -15,6 +15,10 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 // We need firebae admin to run this code. Look at line 2.
 
 exports.getPosts = functions.https.onRequest((req,res) => {
+    // To make sure only GET request are made to this func
+    if(req.method !== 'GET') {
+        res.status(400).json({error: 'Method not allowed'});
+    }
     // This will be used to retrieve the 'posts' collection
     admin.firestore().collection('Posts').get()
         .then(data => {
@@ -30,7 +34,10 @@ exports.getPosts = functions.https.onRequest((req,res) => {
 
 // Function for creating Documents
 exports.createPosts = functions.https.onRequest((req,res) => {
-    // This will be a post request
+    // This will be a post request, so if there's a GET reuqest to this function we need to send a response
+    if(req.method !== 'POST') {
+        return res.status(400).json({error: 'Method not allowed'});
+    }
     const newPost = {
         body: req.body.body, // The second .body is the property ofthe doc
         userHandle: req.body.userHandle,
